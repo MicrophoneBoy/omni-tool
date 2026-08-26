@@ -27,6 +27,26 @@ def has_dir_named(paths, fragment):
     return any(fragment in p.lower() and os.path.isdir(p) for p in paths)
 
 
+SQLITE_MAGIC = b'SQLite format 3\x00'
+# Extension is not reliable for SQLite (see references/sqlite-saves.md), but reading
+# every file's header would be slow on a large game folder -- narrow to files that at
+# least look like they could be save/database files first.
+SQLITE_CANDIDATE_EXTS = ('.db', '.sqlite', '.sqlite3', '.sav', '.dat', '.save')
+
+
+def has_sqlite_file(paths):
+    for p in paths:
+        if not p.lower().endswith(SQLITE_CANDIDATE_EXTS) or not os.path.isfile(p):
+            continue
+        try:
+            with open(p, 'rb') as f:
+                if f.read(16) == SQLITE_MAGIC:
+                    return True
+        except OSError:
+            continue
+    return False
+
+
 SIGNATURES = [
     ('Unity (IL2CPP)', 'unity-il2cpp-saves.md',
      lambda paths, names: has_name(names, 'gameassembly.dll')),
@@ -52,6 +72,8 @@ SIGNATURES = [
      lambda paths, names: has_suffix(paths, '.xp3')),
     ('Wolf RPG Editor', 'interpreter-hooking.md',
      lambda paths, names: has_name(names, 'data.wolf')),
+    ('SQLite database present', 'sqlite-saves.md',
+     lambda paths, names: has_sqlite_file(paths)),
 ]
 
 MAX_DEPTH = 3

@@ -37,6 +37,8 @@ step 4 when steps 1-3 would have solved it in minutes.
    - Unreal Engine (`.pak`, `-WindowsNoEditor.pak`, `GVAS` magic in save files) →
      [ref:unreal-gvas-saves]
    - GameMaker (`data.win`, `options.ini`) → [ref:gamemaker-datawin]
+   - SQLite (magic bytes `SQLite format 3\0`, regardless of extension — common for
+     Android/mobile and some Electron games) → [ref:sqlite-saves]
    - PyInstaller-packaged Python (`_internal/` folder, `.pyz`/`base_library.zip`) →
      [ref:pyinstaller-python-saves]
    - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`) or MZ/MV (`www/` + `package.json` + an
@@ -101,6 +103,10 @@ step 4 when steps 1-3 would have solved it in minutes.
   engine-detection table covering RPG Maker (RGSS and MZ/MV), KiriKiri/KiriKiriZ,
   Wolf RPG Editor, and SRPG Studio, none of which have dedicated save-format docs
   yet; Frida as the buildable alternative to a closed-source hook tool.
+- [ref:sqlite-saves] — detecting a SQLite save by magic bytes not extension, why to
+  always use the standard library instead of hand-rolling a parser for this one
+  format, and the WAL-mode gotcha (the real current state can be sitting in a
+  `-wal`/`-shm` side file, not the main `.db`).
 - [ref:rpgmaker-galleries] — RPG Maker's switches/variables progress model, why its
   galleries generalize across different games better than Ren'Py's do (shared
   community plugin classes vs. bespoke per-game labels), a likely
@@ -134,6 +140,10 @@ step 4 when steps 1-3 would have solved it in minutes.
 - `scripts/unity_es2/` — `es2_read.py` (dump every record), `es2_set.py` (patch one
   field by tag name). Written against Orbt XL but generic to any Easy Save 2 binary
   save — override the target path with the `ES2_SAVE` env var.
+- `scripts/sqlite/` — `sqlite_inspect.py` (list tables/schema, or dump one table's
+  rows), `sqlite_set.py` (update one column by a WHERE match, with WAL-checkpoint and
+  backup handling). Engine-agnostic — works on any SQLite database, not tied to a
+  specific game.
 
 ## Ground rules (apply to every game)
 

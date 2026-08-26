@@ -23,7 +23,7 @@ Not cheats against other real players in live online multiplayer.
   etc.).
 - `scripts/` — real, runnable tooling: an engine detector (`detect_engine.py`), Ren'Py
   RPA archive extraction, GameMaker `data.win` bytecode disassembly/patching, Unity
-  Easy Save 2 record patching.
+  Easy Save 2 record patching, SQLite save inspection/patching.
 
 ## Using this with Claude Code
 
