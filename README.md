@@ -21,8 +21,9 @@ Not cheats against other real players in live online multiplayer.
   recurred across multiple unrelated games (backup discipline, why a game must be
   fully closed before you edit its save, how to spot a shadow-copy anti-tamper field,
   etc.).
-- `scripts/` — real, runnable tooling: Ren'Py RPA archive extraction, GameMaker
-  `data.win` bytecode disassembly/patching, Unity Easy Save 2 record patching.
+- `scripts/` — real, runnable tooling: an engine detector (`detect_engine.py`), Ren'Py
+  RPA archive extraction, GameMaker `data.win` bytecode disassembly/patching, Unity
+  Easy Save 2 record patching.
 
 ## Using this with Claude Code
 

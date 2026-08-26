@@ -22,7 +22,10 @@ step 4 when steps 1-3 would have solved it in minutes.
    (a pygame sim game, Iron Nest, One-armed robber, Orbt XL) store everything in a plain or
    trivially-decodable file. Don't reach for a bytecode patcher or a memory scanner
    until you've confirmed the save format actually resists editing.
-2. **Identify the engine**, since it tells you the save format family:
+2. **Identify the engine**, since it tells you the save format family. Run
+   `python scripts/detect_engine.py "<game folder>"` first — it checks file/folder
+   signatures and points at the right doc, including now RPG Maker (RGSS and MZ/MV),
+   KiriKiri/KiriKiriZ, and Wolf RPG Editor. Then, by format family:
    - Ren'Py (`.rpy`/`.rpyc` in `game/`, `renpy/` SDK folder) → [ref:renpy-galleries],
      [ref:rpa-archives]
    - Unity (`UnityPlayer.dll`, `*_Data/` folder) → check for IL2CPP vs Mono first
@@ -36,6 +39,11 @@ step 4 when steps 1-3 would have solved it in minutes.
    - GameMaker (`data.win`, `options.ini`) → [ref:gamemaker-datawin]
    - PyInstaller-packaged Python (`_internal/` folder, `.pyz`/`base_library.zip`) →
      [ref:pyinstaller-python-saves]
+   - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`), RPG Maker MZ/MV (`www/` + `package.json`
+     + an NW.js exe), KiriKiri/KiriKiriZ (`.xp3` archives), Wolf RPG Editor
+     (`Data.wolf`) → none have a dedicated save-format doc yet; start with
+     [ref:interpreter-hooking] for engine detection and the general technique, and
+     [ref:workflow] step 1 (plain save first) before assuming you need it
 3. **Check whether the engine has its own sanctioned mechanism** for what you're trying
    to do before hand-editing binary state. Example: Ren'Py galleries are gated by
    `renpy.seen_label()`, and Ren'Py ships `renpy.mark_label_seen()` /
@@ -86,6 +94,11 @@ step 4 when steps 1-3 would have solved it in minutes.
   save file worth editing and no mod-loader console available: AOB scanning, pointer
   chains, freeze-vs-patch, DLL injection + IPC, and when to reach for Ghidra/IDA
   instead of a hand-rolled parser.
+- [ref:interpreter-hooking] — hooking an engine's interpreter/VM (Ruby/RGSS, TJS,
+  V8, CPython, Mono) at a stable function instead of chasing a memory address; an
+  engine-detection table covering RPG Maker (RGSS and MZ/MV), KiriKiri/KiriKiriZ,
+  Wolf RPG Editor, and SRPG Studio, none of which have dedicated save-format docs
+  yet; Frida as the buildable alternative to a closed-source hook tool.
 
 ## Further reading
 
@@ -98,6 +111,9 @@ step 4 when steps 1-3 would have solved it in minutes.
 
 ## Scripts
 
+- `scripts/detect_engine.py "<game folder>"` — scans a game's install folder for
+  known engine signatures and prints which reference doc applies. Run this first on
+  any new game.
 - `scripts/renpy/rpa_list.py`, `rpa_extract.py` — list/extract files from an RPA-3.0
   archive. `python rpa_list.py game/scripts.rpa`,
   `python rpa_extract.py game/scripts.rpa out_dir/ gallery/`
