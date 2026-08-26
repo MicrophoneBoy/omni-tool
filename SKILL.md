@@ -39,9 +39,11 @@ step 4 when steps 1-3 would have solved it in minutes.
    - GameMaker (`data.win`, `options.ini`) → [ref:gamemaker-datawin]
    - PyInstaller-packaged Python (`_internal/` folder, `.pyz`/`base_library.zip`) →
      [ref:pyinstaller-python-saves]
-   - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`), RPG Maker MZ/MV (`www/` + `package.json`
-     + an NW.js exe), KiriKiri/KiriKiriZ (`.xp3` archives), Wolf RPG Editor
-     (`Data.wolf`) → none have a dedicated save-format doc yet; start with
+   - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`) or MZ/MV (`www/` + `package.json` + an
+     NW.js exe), specifically for **gallery/recollection unlocks** →
+     [ref:rpgmaker-galleries] (save-file-first approach, then a live-patch fallback)
+   - KiriKiri/KiriKiriZ (`.xp3` archives), Wolf RPG Editor (`Data.wolf`), or any other
+     RPG Maker need beyond gallery unlocks → no dedicated doc yet; start with
      [ref:interpreter-hooking] for engine detection and the general technique, and
      [ref:workflow] step 1 (plain save first) before assuming you need it
 3. **Check whether the engine has its own sanctioned mechanism** for what you're trying
@@ -99,6 +101,11 @@ step 4 when steps 1-3 would have solved it in minutes.
   engine-detection table covering RPG Maker (RGSS and MZ/MV), KiriKiri/KiriKiriZ,
   Wolf RPG Editor, and SRPG Studio, none of which have dedicated save-format docs
   yet; Frida as the buildable alternative to a closed-source hook tool.
+- [ref:rpgmaker-galleries] — RPG Maker's switches/variables progress model, why its
+  galleries generalize across different games better than Ren'Py's do (shared
+  community plugin classes vs. bespoke per-game labels), a likely
+  LZString-compressed-JSON save-file path for MV/MZ, and a live-patch fallback via
+  [ref:interpreter-hooking]. Not yet verified against a real game.
 
 ## Further reading
 
