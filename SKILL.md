@@ -34,16 +34,19 @@ step 4 when steps 1-3 would have solved it in minutes.
      completely different toolchain), then [ref:unity-il2cpp-saves] or
      [ref:unity-es2-saves]
    - Godot (`.pck`, `project.godot` strings in the exe) → [ref:godot-saves]
-   - Unreal Engine (`.pak`, `-WindowsNoEditor.pak`, `GVAS` magic in save files) →
-     [ref:unreal-gvas-saves]
+   - Unreal Engine (a `Paks/` folder, `-WindowsNoEditor.pak`, `GVAS` magic in save
+     files — bare `.pak` alone isn't enough, NW.js games ship their own unrelated
+     `.pak` resource files) → [ref:unreal-gvas-saves]
    - GameMaker (`data.win`, `options.ini`) → [ref:gamemaker-datawin]
    - SQLite (magic bytes `SQLite format 3\0`, regardless of extension — common for
      Android/mobile and some Electron games) → [ref:sqlite-saves]
    - PyInstaller-packaged Python (`_internal/` folder, `.pyz`/`base_library.zip`) →
      [ref:pyinstaller-python-saves]
-   - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`) or MZ/MV (`www/` + `package.json` + an
-     NW.js exe), specifically for **gallery/recollection unlocks** →
-     [ref:rpgmaker-galleries] (save-file-first approach, then a live-patch fallback)
+   - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`) or MZ/MV (`js/rmmz_core.js` or
+     `rmmv_core.js` — present whether or not the game is wrapped in a `www/` folder,
+     many are deployed loose), specifically for **gallery/recollection unlocks** →
+     [ref:rpgmaker-galleries] (save-file-first approach, verified working end to end
+     against a real game, then a live-patch fallback)
    - KiriKiri/KiriKiriZ (`.xp3` archives), Wolf RPG Editor (`Data.wolf`), or any other
      RPG Maker need beyond gallery unlocks → no dedicated doc yet; start with
      [ref:interpreter-hooking] for engine detection and the general technique, and
@@ -109,9 +112,12 @@ step 4 when steps 1-3 would have solved it in minutes.
   `-wal`/`-shm` side file, not the main `.db`).
 - [ref:rpgmaker-galleries] — RPG Maker's switches/variables progress model, why its
   galleries generalize across different games better than Ren'Py's do (shared
-  community plugin classes vs. bespoke per-game labels), a likely
-  LZString-compressed-JSON save-file path for MV/MZ, and a live-patch fallback via
-  [ref:interpreter-hooking]. Not yet verified against a real game.
+  index space and a free name lookup via `data/System.json` vs. bespoke per-game
+  labels), the confirmed MZ save format (pako-deflate + JsonEx `_data` wrapper, with
+  two real gotchas: the on-disk bytes are UTF-8 of a binary string, not the raw
+  deflate stream, and Python's text-mode file reading corrupts it), and a live-patch
+  fallback via [ref:interpreter-hooking]. Verified against a real game (an RPG Maker MZ game).
+  (scripts/rpgmaker)
 
 ## Further reading
 
@@ -144,6 +150,11 @@ step 4 when steps 1-3 would have solved it in minutes.
   rows), `sqlite_set.py` (update one column by a WHERE match, with WAL-checkpoint and
   backup handling). Engine-agnostic — works on any SQLite database, not tied to a
   specific game.
+- `scripts/rpgmaker/` — `mz_save_inspect.py` (decompress and dump an MZ save's
+  switches/variables, or search a game's own `data/System.json` for a switch/variable
+  by name without touching a save at all), `mz_save_set.py` (patch one switch or
+  variable by index, with backup/verify). Written against an RPG Maker MZ game but generic to
+  any RPG Maker MZ `.rmmzsave`.
 
 ## Ground rules (apply to every game)
 
