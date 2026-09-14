@@ -36,7 +36,7 @@ enough to find field/class names for grepping purposes.
 
 ## When the save is genuinely encrypted with an unrecoverable key: patch the running game instead
 
-a Unity IL2CPP management sim's save is AES-CBC via a Unity `EncryptionUtility` asset with a
+The management sim's save is AES-CBC via a Unity `EncryptionUtility` asset with a
 password baked into a serialized field inside an asset bundle — not worth extracting.
 Instead: install a mod loader and patch memory live through it.
 

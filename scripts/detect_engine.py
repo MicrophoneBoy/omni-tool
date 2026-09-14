@@ -60,7 +60,7 @@ SIGNATURES = [
      lambda paths, names: has_suffix(paths, '.pck') or has_name(names, 'project.godot')),
     ('Unreal Engine', 'unreal-gvas-saves.md',
      # bare ".pak" alone false-positives on NW.js/Chromium's own resource paks
-     # (nw_100_percent.pak, locales/*.pak -- hit on the an RPG Maker MZ game RPG Maker MZ
+     # (nw_100_percent.pak, locales/*.pak -- hit on an RPG Maker MZ
      # case), so require the "Paks" cook-output folder or the WindowsNoEditor
      # naming convention instead of just the extension.
      lambda paths, names: has_dir_named(paths, 'paks') or has_suffix(paths, '-windowsnoeditor.pak')),
@@ -68,7 +68,7 @@ SIGNATURES = [
      lambda paths, names: has_name(names, 'base_library.zip') or has_dir_named(paths, '_internal')),
     ('Unity Easy Save 2 plugin', 'unity-es2-saves.md',
      # plain substring "es2" false-positives on ordinary words (valves2.png,
-     # titles2, Cobblestones2.png -- also from the an RPG Maker MZ game case), so require
+     # titles2, Cobblestones2.png -- also from the RPG Maker MZ case), so require
      # it start a word instead of appearing anywhere in the filename.
      lambda paths, names: any(
          p.lower().endswith('.es3') or re.search(r'\bes2', os.path.basename(p), re.I)

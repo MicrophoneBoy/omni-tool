@@ -8,7 +8,7 @@ about to do something and it feels like you've done it before, check here first.
 Order of increasing effort, and what to check for each before moving to the next:
 
 1. **Plain JSON / INI / XML save file.** `grep` the save directory for `.json`,
-   `.ini`, `.sav`, `.dat` and just open one in a text editor. a pygame sim game's entire
+   `.ini`, `.sav`, `.dat` and just open one in a text editor. The game's entire
    save was `json.dumps(indent=4)` — money key `gold`, done in one edit.
 2. **Trivially-decoded binary** (XOR, gzip, base64, a known third-party plugin format
    like Easy Save 2 or GVAS). Check the first few bytes against known magic numbers

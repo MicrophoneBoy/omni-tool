@@ -19,7 +19,7 @@ import os, shutil, struct, sys
 from dw_dis import context, decode
 from dw_refs import owner_index, owner_of
 
-GAME = os.environ.get('DW_DATA_WIN', r'X:\Steam\steamapps\common\Downwell\data.win')
+GAME = os.environ.get('DW_DATA_WIN', r'C:\Program Files (x86)\Steam\steamapps\common\Downwell\data.win')
 BACKUP = GAME + '.hpbackup'
 TARGETS = ('playerHp', 'playerHpMax')
 PUSHI_E = 0x840F0000

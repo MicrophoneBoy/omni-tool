@@ -80,7 +80,7 @@ until a checkpoint happens. Practical consequences:
 A file that's clearly database-shaped (fixed page size, consistent structure) but
 whose first bytes *aren't* the plain `SQLite format 3\0` magic may be **SQLCipher**
 (an encrypted SQLite variant) rather than something else entirely. Same approach as
-any other engine-specific encryption in this toolkit ([ref:godot-saves]'s a Godot dating sim case, [ref:unity-il2cpp-saves]'s a Unity IL2CPP management sim case): check whether the
+any other engine-specific encryption in this toolkit (the dating sim in [ref:godot-saves], the management sim in [ref:unity-il2cpp-saves]): check whether the
 game's own code has the key hardcoded before assuming it's unrecoverable.
 
 ## Verifying against a real game

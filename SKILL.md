@@ -116,7 +116,7 @@ step 4 when steps 1-3 would have solved it in minutes.
   labels), the confirmed MZ save format (pako-deflate + JsonEx `_data` wrapper, with
   two real gotchas: the on-disk bytes are UTF-8 of a binary string, not the raw
   deflate stream, and Python's text-mode file reading corrupts it), and a live-patch
-  fallback via [ref:interpreter-hooking]. Verified against a real game (an RPG Maker MZ game).
+  fallback via [ref:interpreter-hooking]. Verified against a real RPG Maker MZ game.
   (scripts/rpgmaker)
 
 ## Further reading

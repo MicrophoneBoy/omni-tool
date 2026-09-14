@@ -5,7 +5,7 @@ Worked case: **a pygame sim game** (Python 3.11 + pygame, PyInstaller-packaged).
 ## Check the save first — it's very likely plain
 
 Games built this way often just use `json.dump`/`json.dumps` for saves, with zero
-encryption. a pygame sim game's saves were plain JSON at
+encryption. The game's saves were plain JSON at
 `%APPDATA%\<Game>\save\save{N}.json`, formatted with `indent=4` — editing top-level
 keys directly (money key was `gold`) and round-tripping with
 `json.dump(..., ensure_ascii=False)` (to preserve non-ASCII text) was the entire fix.
@@ -46,7 +46,7 @@ point you care about (same "check for a later/different writer" lesson as
 
 ## When to stop
 
-Not every value is reachable this way. a pygame sim game's max-action-points cap resisted
+Not every value is reachable this way. The game's max-action-points cap resisted
 every angle tried (save edit: written but ignored on load; default-data JSON edit: key
 not even read by the loader; a related "increase max" skill: dead code, never
 implemented by the stat-recalculation function; byte-patching the obvious constant and

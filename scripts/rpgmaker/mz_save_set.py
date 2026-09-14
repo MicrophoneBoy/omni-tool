@@ -9,7 +9,7 @@ Find the index first with `python mz_save_inspect.py --names data/System.json
 <keyword>` (searches the game's own switch/variable name list, no save
 needed) -- prefer a game's own single "unlock everything" switch/variable
 over individually flipping every gallery entry, if one exists (see the
-an RPG Maker MZ game case in references/rpgmaker-galleries.md).
+RPG Maker MZ case in references/rpgmaker-galleries.md).
 
 usage: python mz_save_set.py <save.rmmzsave> switches <idx> <true|false>
        python mz_save_set.py <save.rmmzsave> variables <idx> <int>

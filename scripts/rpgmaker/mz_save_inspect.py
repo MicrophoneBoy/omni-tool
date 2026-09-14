@@ -1,6 +1,6 @@
 """Read/write an RPG Maker MZ save (.rmmzsave): the pako-deflate + JsonEx format.
 
-Save format background (confirmed against a real game, see the an RPG Maker MZ game case
+Save format background (confirmed against a real game, see the RPG Maker MZ case
 in references/rpgmaker-galleries.md): the file on disk is NOT raw deflate bytes.
 `StorageManager.jsonToZip` calls `pako.deflate(json, {to: "string", level: 1})`,
 and pako's "to: string" output is a JS *binary string* -- one UTF-16 code unit
@@ -32,7 +32,7 @@ usage:
                                                                  save needed, System.json
                                                                  ships with the game and
                                                                  names every slot. This is
-                                                                 how the an RPG Maker MZ game case
+                                                                 how the RPG Maker MZ case
                                                                  found its master
                                                                  "unlock everything" switch
                                                                  without touching a save.

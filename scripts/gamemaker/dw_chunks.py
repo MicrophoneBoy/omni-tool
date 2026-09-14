@@ -1,7 +1,7 @@
 """Dump the top-level chunk layout of a GameMaker data.win (IFF 'FORM')."""
 import os, struct, sys
 
-PATH = os.environ.get('DW_DATA_WIN', r'X:\Steam\steamapps\common\Downwell\data.win')
+PATH = os.environ.get('DW_DATA_WIN', r'C:\Program Files (x86)\Steam\steamapps\common\Downwell\data.win')
 
 
 def chunks(d):

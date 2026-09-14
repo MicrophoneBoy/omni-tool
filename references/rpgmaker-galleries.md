@@ -10,7 +10,7 @@ indexed arrays that are core to the engine itself, not something each game reinv
   referenced by index, the engine's native "has X happened" flag.
 - **Variables** — a parallel array of numbers, for counters/progress values.
 
-A CG/scene gallery, whether it's a hand-built set of common events (the an RPG Maker MZ game
+A CG/scene gallery, whether it's a hand-built set of common events (the RPG Maker MZ game
 case below) or a shared third-party plugin, almost always gates each unlockable entry
 behind one specific switch — or, more usefully for us, **a game's own `data/System.json`
 ships human-readable names for every switch/variable slot**, since that file is what
@@ -53,7 +53,7 @@ compressed_bytes)`, then `.encode('utf-8')`, written in binary mode.
 `open(path, encoding='utf-8')` in Python's default text mode applies universal-newline
 translation, which silently collapses any embedded `\r\n` (or lone `\r`) byte pair
 inside the compressed stream. This is exactly what happened the first time this was
-tried against an RPG Maker MZ game's real save: decompression produced ~3KB of correct,
+tried against the game's real save: decompression produced ~3KB of correct,
 readable JSON and then failed with `invalid distance too far back` — a classic symptom
 of a stream that's correct up to one silently-dropped byte. Re-reading in `'rb'` mode
 and decoding the bytes explicitly fixed it immediately. `scripts/rpgmaker/` has this
@@ -85,7 +85,7 @@ RPG Maker editor displays instead of raw numbers, so a dev who names their switc
 all (most do, at least for anything they need to find again) gives you a free index.
 `scripts/rpgmaker/mz_save_inspect.py --names data/System.json <keyword>` searches it.
 
-In an RPG Maker MZ game, searching for "回想" (the standard JP term for a CG/scene recollection
+In that game, searching for "回想" (the standard JP term for a CG/scene recollection
 room) turned up ~45 hits: switches 2703–2745, each named after a specific scene (e.g.
 "（回想）マシロが憲兵に誘拐①" — "(Recollection) Mashiro kidnapped by MPs ①"), switch
 1807 gating the recollection room's menu entry itself, and — worth specifically checking
