@@ -4,6 +4,9 @@ Names resolve the way the runtime does: VARI/FUNC store the file offset of a
 name's FIRST reference, and the word *after* each referencing instruction holds
 the delta to the next one. Walking those chains gives offset -> name directly,
 which beats trying to decode the reference's packed index field.
+
+usage: DW_DATA_WIN=path/to/data.win python dw_dis.py <code_entry_name>
+       (exact name, a _suffix, or a substring -- first match is printed)
 """
 import struct, sys
 from dw import load
@@ -116,6 +119,8 @@ def context(path=None):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2 or sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     d, ch, strs, code, strlist, vmap, fmap = context()
     want = sys.argv[1]
     for name, bc, ln, _ in code:

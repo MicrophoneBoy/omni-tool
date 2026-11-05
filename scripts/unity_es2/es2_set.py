@@ -1,20 +1,18 @@
 """Set an Easy Save 2 int field in a Unity save by tag name.
 
-usage: python es2_set.py <tag> <value> [path]
+usage: python es2_set.py <tag> <value> <save_file>
+       (or set ES2_SAVE and omit <save_file>)
 
 Never overwrites an existing backup -- auto-increments (save.bak, save.bak2, ...)
 so every prior state survives. Re-reads the file after writing and asserts the
 size didn't change, since these records are fixed-width. See
 references/unity-es2-saves.md.
 
-Written against Orbt XL but generic to any ES2 binary save -- override the
-target with the ES2_SAVE env var, a trailing path argument, or edit PATH below.
+Written against Orbt XL but generic to any ES2 binary save.
 """
 import os, struct, shutil, sys
 
-PATH = os.environ.get(
-    'ES2_SAVE',
-    os.path.expanduser(r'~\AppData\LocalLow\Adamvision Studios\Orbt XL\dat01.orbtxl'))
+PATH = os.environ.get('ES2_SAVE')
 
 
 def find_value_offset(d, tag):
@@ -32,8 +30,12 @@ def find_value_offset(d, tag):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) not in (3, 4) or sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     tag, new = sys.argv[1], int(sys.argv[2])
     path = sys.argv[3] if len(sys.argv) > 3 else PATH
+    if not path:
+        raise SystemExit(__doc__)
 
     d = bytearray(open(path, 'rb').read())
     hit = find_value_offset(d, tag)

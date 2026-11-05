@@ -14,13 +14,15 @@ data.win never changes size. Sites are located by that pattern rather than by
 hardcoded offsets.
 
 Adapt TARGETS / INIT_SCRIPTS for a different game or variable.
+
+usage: DW_DATA_WIN=path/to/data.win python dw_hp.py           list the sites
+       DW_DATA_WIN=path/to/data.win python dw_hp.py set <n>   patch them all
 """
 import os, shutil, struct, sys
 from dw_dis import context, decode
 from dw_refs import owner_index, owner_of
 
-GAME = os.environ.get('DW_DATA_WIN', r'C:\Program Files (x86)\Steam\steamapps\common\Downwell\data.win')
-BACKUP = GAME + '.hpbackup'
+GAME = os.environ.get('DW_DATA_WIN')
 TARGETS = ('playerHp', 'playerHpMax')
 PUSHI_E = 0x840F0000
 
@@ -52,6 +54,9 @@ def sites(d, vmap, fmap, strlist, code, initonly=True):
 
 
 def main():
+    if (len(sys.argv) > 1 and sys.argv[1] in ('-h', '--help')) or not GAME:
+        raise SystemExit(__doc__)
+    backup = GAME + '.hpbackup'
     d, ch, strs, code, strlist, vmap, fmap = context(GAME)
     found = sites(d, vmap, fmap, strlist, code)
     print('literal HP assignments found: %d' % len(found))
@@ -64,9 +69,9 @@ def main():
     if not (1 <= new <= 32767):
         raise SystemExit('value must be 1..32767 (it is a 16-bit immediate)')
 
-    if not os.path.exists(BACKUP):
-        shutil.copy2(GAME, BACKUP)
-        print('backup -> %s' % os.path.basename(BACKUP))
+    if not os.path.exists(backup):
+        shutil.copy2(GAME, backup)
+        print('backup -> %s' % os.path.basename(backup))
 
     before = len(d)
     for off, val, nm, owner in found:

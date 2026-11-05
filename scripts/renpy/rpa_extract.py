@@ -9,6 +9,8 @@ import sys, os
 from rpa_list import read_index
 
 if __name__ == '__main__':
+    if len(sys.argv) not in (3, 4) or sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     rpa_path = sys.argv[1]
     out_dir = sys.argv[2]
     name_filter = sys.argv[3] if len(sys.argv) > 3 else None

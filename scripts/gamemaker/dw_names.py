@@ -1,4 +1,7 @@
-"""List VARI / FUNC names matching a pattern."""
+"""List VARI / FUNC names matching a pattern.
+
+usage: DW_DATA_WIN=path/to/data.win python dw_names.py [regex]   (default "hp")
+"""
 import re, struct, sys
 from dw import load
 
@@ -33,6 +36,8 @@ def func_names(d, ch, strs):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     d, ch, strs, code = load()
     pat = re.compile(sys.argv[1] if len(sys.argv) > 1 else 'hp', re.I)
     print('=== VARI ===')

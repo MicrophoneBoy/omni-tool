@@ -72,6 +72,36 @@ actually want are one level down:
   not part of the global switches array) — less commonly relevant to gallery unlocks,
   but worth knowing it's shaped differently if you go looking for it.
 
+### MV is the same JSON, encoded differently (confirmed against four real games)
+
+RPG Maker MV (`www/js/rpg_core.js`, saves in `www/save/fileN.rpgsave`) writes
+`LZString.compressToBase64(json)`: plain ASCII on disk, no zlib. Inside, it is the
+exact same JsonEx structure as MZ (`switches._data`, `variables._data`,
+`selfSwitches._data`), so everything else on this page applies unchanged.
+
+Two details that matter if you re-implement it:
+
+- MV bundles **lz-string 1.3.x** (`www/js/libs/lz-string.js`), whose
+  `compressToBase64` packs the LZ bit stream into 16-bit chars and then runs ordinary
+  base64 over those chars. Newer lz-string 1.4.x emits 6-bit groups directly and
+  differs in the final char or two. The game reads either, but matching 1.3.x means an
+  untouched save re-encodes to the exact same file, which is a cheap correctness check.
+  `scripts/rpgmaker/lzstring.py` does this, and was byte-identical on saves from four
+  different MV games.
+- JS strings are UTF-16, so the codec has to work on UTF-16 code units (an emoji is a
+  surrogate pair), not Python code points.
+
+**Cross-save files.** Some MV games add a plugin such as `UTA_CommonSave`
+(`www/js/plugins/`) that keeps chosen switches/variables in a separate
+`www/save/common.rpgsave`, shaped `{"gameSwitches": {"<id>": value}, "gameVariables":
+{...}}` (string IDs, only the IDs the plugin is configured to share). Gallery and
+recollection flags often live there precisely because they must survive across every
+save slot. If flipping a switch in `fileN.rpgsave` does nothing in game, check the
+plugin list and this file. `rm_save_set.py` handles both shapes.
+
+`config.rpgsave` / `global.rpgsave` (and MZ's `config`/`global.rmmzsave`) hold options
+and the save-slot index, not game state.
+
 Classic RPG Maker (RGSS, XP/VX/VX Ace) saves are Ruby `Marshal.dump` of the game
 state — a different, Ruby-specific serialization format, not JSON/pako. Whether
 switches are reachable the same way is still unconfirmed; this toolkit hasn't run
@@ -83,7 +113,8 @@ against a real RGSS save yet.
 arrays of names, indexed identically to the runtime arrays — this is literally what the
 RPG Maker editor displays instead of raw numbers, so a dev who names their switches at
 all (most do, at least for anything they need to find again) gives you a free index.
-`scripts/rpgmaker/mz_save_inspect.py --names data/System.json <keyword>` searches it.
+`scripts/rpgmaker/rm_save_inspect.py --names data/System.json <keyword>` searches it
+(on MV the file is `www/data/System.json`).
 
 In that game, searching for "回想" (the standard JP term for a CG/scene recollection
 room) turned up ~45 hits: switches 2703–2745, each named after a specific scene (e.g.
@@ -92,7 +123,7 @@ room) turned up ~45 hits: switches 2703–2745, each named after a specific scen
 for on any new game before individually flipping dozens of entries — **switch 2748,
 named literally "全開放した" ("unlocked everything")**: a single master flag the game's
 own event logic already uses to bypass every individual check. One switch, patched with
-`mz_save_set.py`, verified by reloading and reading it back. Always check for a
+`rm_save_set.py`, verified by reloading and reading it back. Always check for a
 game's own all-in-one unlock switch/variable before assuming you need to enumerate and
 flip each entry — it's strictly less blast radius and it's common enough to be worth
 the one extra name search.

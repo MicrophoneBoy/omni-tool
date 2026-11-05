@@ -19,7 +19,7 @@ one-off edit.
 
 `scripts/unity_es2/es2_read.py` walks the whole file and prints
 `offset, name, mid, tag, raw, as_int, as_float` for every record — run it first to find
-the tag name you want (override the path with `ES2_SAVE=...`):
+the tag name you want (pass the save path, or set `ES2_SAVE=...`):
 
 ```
 ES2_SAVE="C:\Users\me\AppData\LocalLow\Studio\Game\save.orbtxl" python es2_read.py

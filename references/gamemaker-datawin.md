@@ -101,5 +101,9 @@ will silently revert this kind of patch** — warn the user before they run it.
   optionally patch all of them to a new value with backup + re-read verification.
   Adapt the `TARGETS`/`INIT_SCRIPTS` constants for a different game/variable.
 
-All scripts default to a `data.win` path via a `DW_DATA_WIN` env var override — set it
-before running against a different game.
+All scripts read the target from the `DW_DATA_WIN` env var (`dw_chunks.py` also takes
+it as an argument). There is deliberately no default path: they used to fall back to
+the original worked-case install, which meant forgetting the variable silently read
+(or, for `dw_hp.py set`, patched) the wrong game. Each script prints usage with
+`--help`. The read-only tools were re-checked against a second, unrelated bytecode-17
+game and parsed it fine; `dw_hp.py`'s `TARGETS` are game-specific by design.

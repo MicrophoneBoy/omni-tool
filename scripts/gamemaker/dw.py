@@ -7,12 +7,16 @@ Enough of the format to find and patch GML bytecode:
           shared blob that each entry points into via a *relative* offset
   VARI/FUNC -> name tables the bytecode references
 
-Written against Downwell but generic to any bytecode-15+ data.win. Override the
-default target with the DW_DATA_WIN env var or an explicit path argument.
+Written against Downwell but generic to any bytecode-15+ data.win. Every
+gamemaker/ script reads the target from the DW_DATA_WIN env var (there is no
+default -- a wrong-game fallback is worse than an error).
+
+usage: DW_DATA_WIN=path/to/data.win python dw.py [name_substring]
+       lists code entries whose name contains the substring (default "hp")
 """
 import os, struct, sys
 
-PATH = os.environ.get('DW_DATA_WIN', r'C:\Program Files (x86)\Steam\steamapps\common\Downwell\data.win')
+PATH = os.environ.get('DW_DATA_WIN')
 
 
 def chunks(d):
@@ -63,13 +67,20 @@ def code_entries(d, ch, strs):
 
 
 def load(path=None):
-    d = bytearray(open(path or PATH, 'rb').read())
+    path = path or PATH
+    if not path:
+        raise SystemExit('set DW_DATA_WIN to the game\'s data.win first, e.g.\n'
+                         '  DW_DATA_WIN="C:\\Games\\X\\data.win" python %s'
+                         % os.path.basename(sys.argv[0]))
+    d = bytearray(open(path, 'rb').read())
     ch = chunks(d)
     strs = strings(d, ch)
     return d, ch, strs, code_entries(d, ch, strs)
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     d, ch, strs, code = load()
     print('%d code entries, %d strings' % (len(code), len(strs)))
     pat = (sys.argv[1] if len(sys.argv) > 1 else 'hp').lower()

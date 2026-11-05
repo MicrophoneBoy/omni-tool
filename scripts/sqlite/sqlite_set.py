@@ -35,7 +35,7 @@ def backup(path):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 7:
+    if len(sys.argv) != 7 or sys.argv[1] in ('-h', '--help'):
         raise SystemExit(
             'usage: python sqlite_set.py <db_path> <table> <set_column> <new_value> '
             '<where_column> <where_value>')

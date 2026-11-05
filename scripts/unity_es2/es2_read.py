@@ -3,14 +3,13 @@
 Record layout: 7E <name_len:u8> <name:ascii> <mid:4 bytes> FF <type_tag:4 bytes>
 <value:4 bytes> 7B, repeated back-to-back. See references/unity-es2-saves.md.
 
-Written against Orbt XL but generic to any ES2 binary save -- override the
-target with the ES2_SAVE env var or a path argument.
+Written against Orbt XL but generic to any ES2 binary save.
+
+usage: python es2_read.py <save_file>     (or set ES2_SAVE and omit it)
 """
 import os, struct, sys
 
-PATH = os.environ.get(
-    'ES2_SAVE',
-    os.path.expanduser(r'~\AppData\LocalLow\Adamvision Studios\Orbt XL\dat01.orbtxl'))
+PATH = os.environ.get('ES2_SAVE')
 
 
 def records(d):
@@ -31,7 +30,11 @@ def records(d):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     path = sys.argv[1] if len(sys.argv) > 1 else PATH
+    if not path:
+        raise SystemExit(__doc__)
     d = open(path, 'rb').read()
     print('size', len(d))
     recs = list(records(d))

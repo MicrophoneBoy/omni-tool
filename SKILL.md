@@ -1,6 +1,6 @@
 ---
 name: omni-tool
-description: "Toolkit and playbook for editing single-player game save/persistent data — unlocking gallery/replay content, changing money or stats, or otherwise modifying local game state without playing through it. Covers Ren'Py (seen-label galleries, RPA archives), Unity (IL2CPP saves, Easy Save 2 binary records, live BepInEx/UnityExplorer patching), Godot (GDEC encrypted saves, PCK archives), Unreal Engine (GVAS saves), and GameMaker (data.win bytecode patching). Use when asked to unlock content, edit a save file, or modify a game's persistent state."
+description: "Toolkit and playbook for editing single-player game save/persistent data: unlocking gallery/replay content, changing money or stats, or otherwise modifying local game state without playing through it. Covers Ren'Py (seen-label galleries, RPA archives), Unity (IL2CPP saves, Easy Save 2 binary records, live BepInEx/UnityExplorer patching), Godot (GDEC encrypted saves, PCK archives), Unreal Engine (GVAS saves), GameMaker (data.win bytecode patching), RPG Maker MV/MZ (switch/variable gallery unlocks in .rpgsave/.rmmzsave), TyranoScript (escape()-encoded JSON saves), and SQLite saves. Use when asked to unlock content, edit a save file, or modify a game's persistent state."
 license: MIT
 user-invocable: true
 tags: [game-modding, save-editing, reverse-engineering]
@@ -24,7 +24,8 @@ step 4 when steps 1-3 would have solved it in minutes.
    until you've confirmed the save format actually resists editing.
 2. **Identify the engine**, since it tells you the save format family. Run
    `python scripts/detect_engine.py "<game folder>"` first — it checks file/folder
-   signatures and points at the right doc, including now RPG Maker (RGSS and MZ/MV),
+   signatures (4 folders deep, so double-wrapped downloads are fine) and points at
+   the right doc, including RPG Maker (RGSS, MV and MZ, told apart), TyranoScript,
    KiriKiri/KiriKiriZ, and Wolf RPG Editor. Then, by format family:
    - Ren'Py (`.rpy`/`.rpyc` in `game/`, `renpy/` SDK folder) → [ref:renpy-galleries],
      [ref:rpa-archives]
@@ -42,11 +43,14 @@ step 4 when steps 1-3 would have solved it in minutes.
      Android/mobile and some Electron games) → [ref:sqlite-saves]
    - PyInstaller-packaged Python (`_internal/` folder, `.pyz`/`base_library.zip`) →
      [ref:pyinstaller-python-saves]
-   - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`) or MZ/MV (`js/rmmz_core.js` or
-     `rmmv_core.js` — present whether or not the game is wrapped in a `www/` folder,
-     many are deployed loose), specifically for **gallery/recollection unlocks** →
+   - RPG Maker XP/VX/VX Ace (`RGSS1/2/3.dll`, or just `Data/*.rvdata2`/`.rxdata` since
+     the dll often lives in the shared RTP), MZ (`js/rmmz_core.js`, `.rmmzsave`) or MV
+     (`www/js/rpg_core.js`, `.rpgsave`; MZ is often deployed loose, MV inside `www/`),
+     specifically for **gallery/recollection unlocks** →
      [ref:rpgmaker-galleries] (save-file-first approach, verified working end to end
-     against a real game, then a live-patch fallback)
+     against real MZ and MV games, then a live-patch fallback)
+   - TyranoScript (a `tyrano/` folder, or on NW.js builds just a `*_sf.sav` next to a
+     huge exe that is secretly a zip of the game) → [ref:tyrano-saves]
    - KiriKiri/KiriKiriZ (`.xp3` archives), Wolf RPG Editor (`Data.wolf`), or any other
      RPG Maker need beyond gallery unlocks → no dedicated doc yet; start with
      [ref:interpreter-hooking] for engine detection and the general technique, and
@@ -116,8 +120,12 @@ step 4 when steps 1-3 would have solved it in minutes.
   labels), the confirmed MZ save format (pako-deflate + JsonEx `_data` wrapper, with
   two real gotchas: the on-disk bytes are UTF-8 of a binary string, not the raw
   deflate stream, and Python's text-mode file reading corrupts it), and a live-patch
-  fallback via [ref:interpreter-hooking]. Verified against a real RPG Maker MZ game.
-  (scripts/rpgmaker)
+  fallback via [ref:interpreter-hooking]. Also MV's LZString base64 saves and the
+  cross-save `common.rpgsave` that some MV gallery plugins use. Verified against real
+  MZ and MV games. (scripts/rpgmaker)
+- [ref:tyrano-saves]: TyranoScript `escape(JSON)` saves, `sf.*` (shared across
+  slots, where gallery flags live) vs per-slot `f.*`, and reading the scenario `.ks`
+  files straight out of an NW.js exe with `zipfile`. (scripts/tyrano)
 
 ## Further reading
 
@@ -141,20 +149,24 @@ step 4 when steps 1-3 would have solved it in minutes.
   (disassembler), `dw_refs.py` (all reads/writes of a variable name, with owning
   script), `dw_hp.py` (worked example: find and patch every literal-assignment site for
   a given global). All are GameMaker bytecode-17 tools written against Downwell but
-  generic to any data.win of that bytecode version — override the target path with the
-  `DW_DATA_WIN` env var.
+  generic to any data.win of that bytecode version. Set `DW_DATA_WIN` to the target
+  (required, no default).
 - `scripts/unity_es2/` — `es2_read.py` (dump every record), `es2_set.py` (patch one
   field by tag name). Written against Orbt XL but generic to any Easy Save 2 binary
-  save — override the target path with the `ES2_SAVE` env var.
+  save. Pass the save path, or set `ES2_SAVE`.
 - `scripts/sqlite/` — `sqlite_inspect.py` (list tables/schema, or dump one table's
   rows), `sqlite_set.py` (update one column by a WHERE match, with WAL-checkpoint and
   backup handling). Engine-agnostic — works on any SQLite database, not tied to a
   specific game.
-- `scripts/rpgmaker/` — `mz_save_inspect.py` (decompress and dump an MZ save's
-  switches/variables, or search a game's own `data/System.json` for a switch/variable
-  by name without touching a save at all), `mz_save_set.py` (patch one switch or
-  variable by index, with backup/verify). Written against an RPG Maker MZ game but generic to
-  any RPG Maker MZ `.rmmzsave`.
+- `scripts/rpgmaker/`: `rm_save_inspect.py` (decode and dump an MZ `.rmmzsave` or MV
+  `.rpgsave`, or search a game's own `System.json` for a switch/variable by name
+  without touching a save at all), `rm_save_set.py` (patch one switch or variable by
+  index, with backup/verify; also handles MV `common.rpgsave` cross-save files),
+  `lzstring.py` (MV's codec, byte-identical to the game's own).
+- `scripts/tyrano/tyrano_save.py`: dump, `get`, or `set` a dotted key in a
+  TyranoScript `.sav`, with backup/verify.
+
+Every script prints its usage with `--help`.
 
 ## Ground rules (apply to every game)
 

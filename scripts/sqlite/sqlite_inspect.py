@@ -8,7 +8,7 @@ usage:
   python sqlite_inspect.py <db_path>                 # list tables + schema
   python sqlite_inspect.py <db_path> <table>          # dump every row of one table
 """
-import sqlite3, sys
+import os, sqlite3, sys
 
 
 def list_tables(conn):
@@ -21,9 +21,11 @@ def schema_of(conn, table):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        raise SystemExit('usage: python sqlite_inspect.py <db_path> [table]')
+    if len(sys.argv) not in (2, 3) or sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     path = sys.argv[1]
+    if not os.path.isfile(path):
+        raise SystemExit('no such file: %s' % path)
 
     # Read-only connection (uri mode) so this never accidentally creates or
     # locks a WAL file just from inspecting.

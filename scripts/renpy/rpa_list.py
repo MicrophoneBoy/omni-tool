@@ -35,6 +35,8 @@ def read_index(path):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2 or sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     version, offset, key, index = read_index(sys.argv[1])
     print(f"version={version} offset={offset:#x} key={key:#x} num_files={len(index)}")
     for name in sorted(index.keys()):

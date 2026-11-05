@@ -1,5 +1,9 @@
 """Every reference to a named variable, with the owning code entry and a
-few instructions of context. Writes (pop) are what matter for patching."""
+few instructions of context. Writes (pop) are what matter for patching.
+
+usage: DW_DATA_WIN=path/to/data.win python dw_refs.py <variable_name_regex>
+       (full match, case-insensitive)
+"""
 import re, sys
 from dw_dis import context, decode
 from dw_names import vari_names
@@ -24,6 +28,8 @@ def owner_of(spans, off):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2 or sys.argv[1] in ('-h', '--help'):
+        raise SystemExit(__doc__)
     d, ch, strs, code, strlist, vmap, fmap = context()
     pat = re.compile(sys.argv[1], re.I)
     spans = owner_index(code)
